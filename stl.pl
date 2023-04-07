@@ -1,18 +1,33 @@
 %% utilities for producing STL files from sequences of points
 
-write_stl(Filename) :-
+write_stl(Filename, Facets) :-
     open(Filename, write, Stream),
-    write(Stream, "Hello, world!\n"),
+    write(Stream, "solid MYSOLID\n"),
+    write_facets(Facets, Stream),
+    write(Stream, "endsolid MYSOLID\n"),
     close(Stream).
 
-format_facet(Result) :-
-    format(string(I1), "  facet normal ~w\n", [0.0]),
-    string_concat(I1, "    outer loop\n", I2),
-    string_concat(I2, "    end loop\n", I3),
-    string_concat(I3, "  endfacet\n", Result).
+write_facets([], _).
+write_facets([F|T], Stream) :-
+    format_facet(F, Result),
+    write(Stream, Result),
+    write_facets(T, Stream).
 
-format_vertex(X,Y,Z,Result) :-
-    format(string(Result), "      vertex    ~w   ~w   ~w", [X,Y,Z]).
+format_facet(facet(P1,P2,P3),Result) :-
+    facet_normal(P1,P2,P3,vector(Xn,Yn,Zn)),
+    format(string(I1), "  facet normal  ~w  ~w  ~w\n", [Xn,Yn,Zn]),
+    string_concat(I1, "    outer loop\n", I2),
+    format_point(P1, P1s),
+    string_concat(I2, P1s, I3),
+    format_point(P2, P2s),
+    string_concat(I3, P2s, I4),
+    format_point(P3, P3s),
+    string_concat(I4, P3s, I5),
+    string_concat(I5, "    endloop\n", I6),
+    string_concat(I6, "  endfacet\n", Result).
+
+format_point(point(X,Y,Z), Ps) :-
+    format(string(Ps), "      vertex    ~w  ~w  ~w\n", [X,Y,Z]).
 
 compute_vector(point(X1,Y1,Z1), point(X2,Y2,Z2), vector(X,Y,Z)) :-
     X is X2-X1,
