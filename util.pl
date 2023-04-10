@@ -44,3 +44,22 @@ l_reverse([], []).
 l_reverse([H1|T1], L2) :-
     l_reverse(T1, RT1),
     l_append(RT1, [H1], L2).
+
+%% l_map(Pred, L0, L) :- L is L0 transformed by Pred
+l_map(_, [], []).
+l_map(Pred, [H0|T0], [H|T]) :-
+    call(Pred, H0, H),
+    l_map(Pred, T0, T).
+
+%% Map over two lists: Pred(HA, HB, H)
+l_map(_, [], _, []).
+l_map(_, _, [], []).
+l_map(Pred, [HA|TA], [HB|TB], [H|T]) :-
+    call(Pred, HA, HB, H),
+    l_map(Pred, TA, TB, T).
+
+%% l_foldr(Pred, Init, [H|T], Out)
+l_foldr(_, A, [], A).
+l_foldr(Pred, A0, [H|T], A) :-
+    call(Pred, A0, H, A1),
+    l_foldr(Pred, A1, T, A).
