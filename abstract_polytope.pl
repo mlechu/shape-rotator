@@ -98,11 +98,13 @@ ap_dual_has_v(V0, zip(E0, _)) :-
 %% F is the dual face of V0
 ap_dual_face(E0s, Es, V0, F) :-
     l_zip(E0s, Es, E0_E_mapping),
-    l_filter(call(ap_dual_has_v(V0)), E0_E_mapping, E1s),
+    l_filter(call(ap_dual_has_v(V0)), E0_E_mapping, E1Ms),
+    % retrieve the second of each mapping
+    l_map(call(arg(2)), E1Ms, E1s),
     F = face(E1s).
 
 %% The dual of an ap is its upside-down graph!
-ap_dual(AP0, Vs) :-
+ap_dual(AP0, AP) :-
     AP0 = ap(F0s),
 
     %% Ps is the list of central points of F0s
@@ -121,9 +123,11 @@ ap_dual(AP0, Vs) :-
     %%      (This is a face with all the dual edges
     %%      of the original edges radiating from P0)
     setof(V_tmp, has_v(AP0, V_tmp), V0s),
-    l_map(call(ap_dual_face(E0s, Es)), V0s, Vs).
+    l_map(call(ap_dual_face(E0s, Es)), V0s, Fs),
+    AP = ap(Fs).
 
 
 
 %% g_to_ap()
 %% ap_contains(T, face([edge(point(1, 1, 1), point(1, -1, -1)), edge(point(1, 1, 1), point(-1, -1, 1)), edge(point(1, -1, -1), point(-1, -1, 1))])).
+
