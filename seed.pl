@@ -1,17 +1,18 @@
+:- consult(util).
 %% point(x, y, z)
 
 %% vertex(point, [point ...])
 %%               connections
 
-%% shape([vertex ...])
+%% graph([vertex ...])
 
-%% Generate a shape from a seed (letter)
+%% Generate a shape graph from a seed (letter)
 %% Supports all 5 platonic solids
 %%
 %% TODO high chance dodecahedron and icosahedron edges are wrong
 %%
-s_seed('T', % Tetrahedron
-       shape([vertex(V1,[V2, V3, V4]),
+g_seed('T', % Tetrahedron
+       graph([vertex(V1,[V2, V3, V4]),
               vertex(V2,[V1, V3, V4]),
               vertex(V3,[V1, V2, V4]),
               vertex(V4,[V1, V2, V3])])) :-
@@ -20,8 +21,8 @@ s_seed('T', % Tetrahedron
     p_def(V3, point(-1, 1,-1)),
     p_def(V4, point(-1,-1, 1)).
 
-s_seed('C', % Cube
-       shape([vertex(AAA,[BAA, ABA, AAB]),
+g_seed('C', % Cube
+       graph([vertex(AAA,[BAA, ABA, AAB]),
               vertex(AAB,[BAB, ABB, AAA]),
               vertex(ABA,[BBA, AAA, ABB]),
               vertex(ABB,[BBB, AAB, ABA]),
@@ -38,8 +39,8 @@ s_seed('C', % Cube
     p_def(BBA, point(-1,-1, 1)),
     p_def(BBB, point(-1,-1,-1)).
 
-s_seed('O', % Octahedron
-       shape([vertex(VX,[VY, Vy, VZ, Vz]),
+g_seed('O', % Octahedron
+       graph([vertex(VX,[VY, Vy, VZ, Vz]),
               vertex(Vx,[VY, Vy, VZ, Vz]),
               vertex(VY,[VX, Vx, VZ, Vz]),
               vertex(Vy,[VX, Vx, VZ, Vz]),
@@ -52,8 +53,8 @@ s_seed('O', % Octahedron
     p_def(VZ, point( 0, 0, 1)),
     p_def(Vz, point( 0, 0,-1)).
 
-s_seed('D', % Dodecahedron
-       shape([vertex(AAA,[XAA, YAA, ZAA]),
+g_seed('D', % Dodecahedron
+       graph([vertex(AAA,[XAA, YAA, ZAA]),
               vertex(AAB,[XAB, YAB, ZAB]),
               vertex(ABA,[XBA, YBA, ZBA]),
               vertex(ABB,[XBB, YBB, ZBB]),
@@ -98,8 +99,8 @@ s_seed('D', % Dodecahedron
     p_def(ZBA, point(IM,RP, 0)),
     p_def(ZBB, point(IM,RM, 0)).
 
-s_seed('I', % Icosahedron
-       shape([vertex(XAA, [XBA, YAA, YBA, ZAA, ZAB]),
+g_seed('I', % Icosahedron
+       graph([vertex(XAA, [XBA, YAA, YBA, ZAA, ZAB]),
               vertex(XAB, [XBB, YBA, YBB, ZAA, ZAB]),
               vertex(XBA, [XAA, YAA, YBA, ZBA, ZBB]),
               vertex(XBB, [XAB, YBA, YBB, ZBA, ZBB]),
