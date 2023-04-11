@@ -1,3 +1,8 @@
+:- module(ap, [ap_dual/2,
+               make_e/3,
+               has_v/2,
+               has_e/2,
+               has_f/2]).
 :- consult(util).
 % https://en.wikipedia.org/wiki/Abstract_polytope
 % The abstract polytope is a lattice describing what faces contain what edges
@@ -18,7 +23,7 @@ has_v(ap(Fs), V) :-
 
 has_e(face(Es), edge(A, B)) :-
     member(edge(A, B), Es).
-%% should not be necessary with e_make
+%% should not be necessary with make_e
 %% has_e(face(Es), edge(A, B)) :-
 %%     member(edge(B, A), Es).
 has_e(ap(Fs), E) :-
@@ -28,27 +33,10 @@ has_e(ap(Fs), E) :-
 has_f(ap(Fs), F) :-
     member(F, Fs).
 
-%% e_make(E, A, B) :- E is edge(X, Y) where X < Y
+%% make_e(E, A, B) :- E is edge(X, Y) where X < Y
 %% Ordering helps with searching for an edge in a face
-e_make(edge(A, B), A, B) :- A @=< B, !.
-e_make(edge(B, A), A, B).
-
-ap_seed('T', T) :-
-    V0 = point( 1, 1, 1),
-    V1 = point( 1,-1,-1),
-    V2 = point(-1,-1, 1),
-    V3 = point(-1, 1,-1),
-    e_make(E0, V0, V1        ),
-    e_make(E1, V0,     V2    ),
-    e_make(E2, V0,         V3),
-    e_make(E3,     V1, V2    ),
-    e_make(E4,     V1,     V3),
-    e_make(E5,         V2, V3),
-    F0 = face([E0, E1, E3]),
-    F1 = face([E1, E2, E5]),
-    F2 = face([E0, E2, E4]),
-    F3 = face([E3, E4, E5]),
-    T = ap([F0, F1, F2, F3]).
+make_e(edge(A, B), A, B) :- A @=< B, !.
+make_e(edge(B, A), A, B).
 
 %% ap_normalize(A0, A) :-
 %%     A0 = ap(Fs),
@@ -59,14 +47,6 @@ ap_seed('T', T) :-
     P2 is A2 + B2,
     P3 is A3 + B3,
     P = point(P1, P2, P3).
-
-%% arity-1 preds for testing
-example_ap(T) :- ap_seed('T', T).
-example_f(face([edge(point(1, 1, 1), point(1, -1, -1)),
-                edge(point(1, 1, 1), point(-1, -1, 1)),
-                edge(point(1, -1, -1), point(-1, -1, 1))])).
-example_edge0(edge(point(1, 1, 1), point(1, -1, -1))).
-example_edge0R(edge(point(1, -1, -1), point(1, 1, 1))).
 
 %% ap_face_avg :- P is the central point of face F
 ap_face_avg(F, P) :-
@@ -89,7 +69,7 @@ ap_dual_edge(F0s, Vs, E0, E) :-
     member(zip(FB, VB), F0_V_mapping),
     has_e(FB, E0),
     !,
-    e_make(E, VA, VB).
+    make_e(E, VA, VB).
 
 %% gross. pls fix
 ap_dual_has_v(V0, zip(E0, _)) :-
@@ -118,10 +98,8 @@ ap_dual(AP0, AP) :-
 
     %% for each vertex V0 in V0s:
     %%      search E0s; find the edges E0s P0 appears in
-    %%
-    %%      add to Fs face(Es[Z0], Es[Z1]...)
-    %%      (This is a face with all the dual edges
-    %%      of the original edges radiating from P0)
+    %%      Es = the duals of E0s
+    %%      add (to Fs) face(Es)
     setof(V_tmp, has_v(AP0, V_tmp), V0s),
     l_map(call(ap_dual_face(E0s, Es)), V0s, Fs),
     AP = ap(Fs).
