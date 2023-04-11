@@ -51,9 +51,9 @@ l_map(Pred, [H0|T0], [H|T]) :-
     call(Pred, H0, H),
     l_map(Pred, T0, T).
 
-%% Map over two lists: Pred(HA, HB, H)
-l_map(_, [], _, []).
-l_map(_, _, [], []).
+%% Pred(HA, HB, H) forall H
+%% Map over two lists (or get two return values)
+l_map(_, [], [], []).
 l_map(Pred, [HA|TA], [HB|TB], [H|T]) :-
     call(Pred, HA, HB, H),
     l_map(Pred, TA, TB, T).
@@ -63,3 +63,12 @@ l_foldr(_, A, [], A).
 l_foldr(Pred, A0, [H|T], A) :-
     call(Pred, A0, H, A1),
     l_foldr(Pred, A1, T, A).
+
+l_filter(_, [], []).
+l_filter(Pred, [H0|T0], L) :-
+    l_filter(Pred, T0, LT),
+    ( call(Pred, H0) -> L = [H0|LT] ; L = LT).
+
+l_zip([], [], []).
+l_zip([HA|TA], [HB|TB], [zip(HA, HB)|T]) :-
+    l_zip(TA, TB, T).
