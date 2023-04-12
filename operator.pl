@@ -10,13 +10,13 @@
 %%
 %% algorithms reqd only for dual, (ambo OR join), kis, gyro, maybe propellor
 %%
-apply_op(AP, a, AP0).
-apply_op(AP, d, AP0) :- op_dual(AP0, AP).
-apply_op(AP, g, AP0).
-apply_op(AP, j, AP0).
-apply_op(AP, k, AP0).
-apply_op(AP, s, AP0).
-apply_op(AP, t, AP0).
+apply_op(a, AP0, AP).
+apply_op(d, AP0, AP) :- op_dual(AP0, AP).
+apply_op(g, AP0, AP).
+apply_op(j, AP0, AP).
+apply_op(k, AP0, AP).
+apply_op(s, AP0, AP).
+apply_op(t, AP0, AP).
 
 %% E is the dual edge of E0
 op_dual_edge(F0s, Vs, E0, E) :-
@@ -25,6 +25,7 @@ op_dual_edge(F0s, Vs, E0, E) :-
     ap_has_e(FA, E0),
     !,
     member(zip(FB, VB), F0_V_mapping),
+    dif(VA, VB),
     ap_has_e(FB, E0),
     !,
     ap_make_e(E, VA, VB).
