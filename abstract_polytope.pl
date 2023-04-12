@@ -1,9 +1,6 @@
-% https://en.wikipedia.org/wiki/Abstract_polytope
 % The abstract polytope is a lattice describing what faces contain what edges
 % and what edges contain what vertices. In R^3, there will always be 5 levels
 % (the top being the polyhedron, the bottom being some sort of null node)
-%
-% Trying this out because it may make operations easier. might delete.
 
 :- consult(util).
 
@@ -11,8 +8,8 @@
 ap_has_v(edge(V, _), V).
 ap_has_v(edge(_, V), V).
 ap_has_v(face(Es), V) :-
-    member(E, Es),
-    ap_has_v(E, V).
+    member(edge(X,Y), Es),
+    ap_has_v(edge(X,Y), V).
 ap_has_v(ap(Fs), V) :-
     member(face(Es), Fs),
     ap_has_v(face(Es), V).

@@ -25,7 +25,7 @@ golden_ratio((1 + sqrt(5)) / 2).
 %% reflect(z, point(X, Y, Z1), point(X, Y, Z2)) :- Z2 is Z1 * -1.
 
 
-%% str_to_l(S, L) :- L is the list of characters in string S
+%% str_to_l(S, L) :- L is the list of characters (as atoms) in string S
 str_to_l(S, L) :-
     atom_codes(A, S),
     atom_chars(A, L).
