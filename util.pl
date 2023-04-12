@@ -41,6 +41,20 @@ golden_ratio((1 + sqrt(5)) / 2).
 %% reflect(y, point(X, Y1,Z),  point(X, Y2,Z))  :- Y2 is Y1 * -1.
 %% reflect(z, point(X, Y, Z1), point(X, Y, Z2)) :- Z2 is Z1 * -1.
 
+%% Get a callable F from an existing callable and args
+%%
+%% e.g. args_append(dif, [X, Y], dif(X, Y))
+args_append(Name, Extra, F) :-
+    atom(Name),
+    !,
+    compound_name_arguments(F, Name, Extra).
+%% e.g. args_append(dif(X), [Y], dif(X, Y))
+args_append(Goal, Extra, F) :-
+    compound(Goal),
+    !,
+    compound_name_arguments(Goal, Name, Args0),
+    l_append(Args0, Extra, Args),
+    compound_name_arguments(F, Name, Args).
 
 %% str_to_l(S, L) :- L is the list of characters (as atoms) in string S
 str_to_l(S, L) :-
@@ -81,10 +95,30 @@ l_foldr(Pred, A0, [H|T], A) :-
     call(Pred, A0, H, A1),
     l_foldr(Pred, A1, T, A).
 
+%% Pred is called with any args it comes with and each element El of the list
+%%
+%% Pred = f -> we call f(El)
+%% Pred = f(a, b, c) -> we call f(a, b, c, El)
 l_filter(_, [], []).
 l_filter(Pred, [H0|T0], L) :-
     l_filter(Pred, T0, LT),
     ( call(Pred, H0) -> L = [H0|LT] ; L = LT).
+
+%% Pred is called with an additional list of arguments after the El
+%%
+%% Pred  = f
+%% Extra = [x1,x2,x3]
+%%      -> we call f(El, x1, x2, x3)
+%% Pred  = f(a, b, c)
+%% Extra = [x1,x2,x3]
+%%      -> we call f(a, b, c, El, x1, x2, x3)
+l_filter(_, [], _, []).
+l_filter(Pred0, [H0|T0], Extra, L) :-
+    l_filter(Pred0, T0, Extra, LT),
+    args_append(Pred0, [H0|Extra], Pred),
+    ( call(Pred)
+    -> L = [H0|LT]
+    ; L = LT ).
 
 l_zip([], [], []).
 l_zip([HA|TA], [HB|TB], [zip(HA, HB)|T]) :-
