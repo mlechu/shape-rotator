@@ -1,16 +1,33 @@
 %% point(x,y,z)
 %% Field accessors
-p_(x, point(X,_,_), X).
-p_(y, point(_,Y,_), Y).
-p_(z, point(_,_,Z), Z).
+%% p_(x, point(X,_,_), X).
+%% p_(y, point(_,Y,_), Y).
+%% p_(z, point(_,_,Z), Z).
 
 %% Bind a point to a name (makes code shorter)
 p_def(point(X, Y, Z), point(X, Y, Z)).
 
-p_mm(point(X,Y,Z), mat(A1,A2,A3,B1,B2,B3,C1,C2,C3), point(X2,Y2,Z2)) :-
-    X2 is X * A1 + Y * A2 + Z * A3,
-    Y2 is X * B1 + Y * B2 + Z * B3,
-    Z2 is X * C1 + Y * C2 + Z * C3.
+p_mat(mat(AX,AY,AZ,
+          BX,BY,BZ,
+          CX,CY,CZ), P0, P) :-
+    P0 = point(X0,Y0,Z0),
+    X is X0 * AX + Y0 * AY + Z0 * AZ,
+    Y is X0 * BX + Y0 * BY + Z0 * BZ,
+    Z is X0 * CX + Y0 * CY + Z0 * CZ,
+    P = point(X, Y, Z).
+
+%% ops defined on points
++(point(AX, AY, AZ), point(BX, BY, BZ), P) :-
+    PX is AX + BX,
+    PY is AY + BY,
+    PZ is AZ + BZ,
+    P = point(PX, PY, PZ).
+
+*(point(P0X,P0Y,P0Z), Scalar, P) :-
+    PX is P0X * Scalar,
+    PY is P0Y * Scalar,
+    PZ is P0Z * Scalar,
+    P = point(PX, PY, PZ).
 
 %% p_pm(Coords, P0, PS) :-
 %% PS is a list of 2^Coords points such that each Coord allows

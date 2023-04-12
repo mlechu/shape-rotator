@@ -34,19 +34,18 @@ ap_make_e(edge(B, A), A, B).
 %% ap_normalize(A0, A) :-
 %%     A0 = ap(Fs),
 
-%% + defined on points
-+(point(A1, A2, A3), point(B1, B2, B3), P) :-
-    P1 is A1 + B1,
-    P2 is A2 + B2,
-    P3 is A3 + B3,
-    P = point(P1, P2, P3).
-
 %% ap_face_avg :- P is the central point of face F
 ap_face_avg(F, P) :-
     setof(V, ap_has_v(F, V), FVs),
     length(FVs, L),
     l_foldr(+, point(0,0,0), FVs, point(X1, Y1, Z1)),
     P = point(X1 / L, Y1 / L, Z1 / L).
+
+%% P is the midpoint of E
+ap_edge_avg(E, P) :-
+    E = edge(PA, PB),
+    +(PA, PB, PS),
+    *(PS, 1/2, P).
 
 %% order a face's edges clockwise by angle from the centre
 %% assumes 2d shape is convex
