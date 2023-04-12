@@ -51,8 +51,8 @@ ap_seed('C', Cube) :-
     F1 = face([BAX, BXA, BBX, BXB]),
     F2 = face([AXA, XAA, BXA, XBA]),
     F3 = face([AXB, XAB, BXB, XBB]),
-    F4 = face([XAA, AAX, XAB, ABX]),
-    F5 = face([XBA, BAX, XBB, BBX]),
+    F4 = face([XAA, AAX, XAB, BAX]),
+    F5 = face([XBA, ABX, XBB, BBX]),
     Cube = ap([F0, F1, F2, F3, F4, F5]).
 
 % lol
