@@ -1,6 +1,20 @@
 # shape rotator
 
-## usage
+## Code
+- Generally a variable `X0` is the untransformed version of `X`
+
+TODO: 
+
+- ambo
+- kis
+- gyro
+- reflect
+- resize
+- ap ->stl
+- readme
+- wiki
+
+## Usage
 1. generate polyhedra from a seed (character representing platonic solid)
     - e.g. "T" for tetrahedron
 2. modify seed polyhedron using John Conway polyhedron notation 
@@ -13,15 +27,7 @@
         - extra ambitious: interactive SVG option
 4. we can check graph isomorphism vs known polyhedra database add a caption to the output if there's a match
 
-## internals
-
-note: I'm currently using ISO prolog wherever possible instead of the swipl libraries. It might be wise to switch from swipl to gnu prolog. 
-
-- represent everything as a graph? 
-    - Maybe a matrix would be more efficient, if I can figure out how the operators and their corresponding matrices on the wikipedia work
-    - vertex configuration looks cool but unfortunately only works for uniform polyhedra. Perhaps still useful for the isomorphism check?
-
-## resources
+## Resources
 
 - wikipedia: https://en.wikipedia.org/wiki/Conway_polyhedron_notation
 - operators in simple english: https://www.georgehart.com/virtual-polyhedra/conway_notation.html
