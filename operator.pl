@@ -1,15 +1,7 @@
 :- ensure_loaded(util).
 :- ensure_loaded(abstract_polytope).
 
-%% TODO
-%% irreducible: ambo (djd*), dual, gyro, join (dad*), kis, snub (dgd), truncate (dkd)
-%%
-%% easy: bevel (ta), expand (aa), meta (kj), ortho (jj)
-%%
-%% maybe (in addition to john's set): reflect (easy), propellor, needle (kd), zip (dk)
-%%
-%% algorithms reqd only for dual, (ambo OR join), kis, gyro, maybe propellor
-%%
+%% TODO propellor, reflect, gyro
 apply_op(a, AP0, AP) :-
     op_ambo(AP0, AP).
 apply_op(d, AP0, AP) :-
@@ -30,6 +22,24 @@ apply_op(t, AP0, AP) :-
     apply_op(d, AP0, AP1),
     apply_op(k, AP1, AP2),
     apply_op(d, AP2, AP).
+apply_op(b, AP0, AP) :-
+    apply_op(t, AP0, AP1),
+    apply_op(a, AP1, AP).
+apply_op(e, AP0, AP) :-
+    apply_op(a, AP0, AP1),
+    apply_op(a, AP1, AP).
+apply_op(m, AP0, AP) :-
+    apply_op(k, AP0, AP1),
+    apply_op(j, AP1, AP).
+apply_op(o, AP0, AP) :-
+    apply_op(j, AP0, AP1),
+    apply_op(j, AP1, AP).
+apply_op(n, AP0, AP) :-
+    apply_op(k, AP0, AP1),
+    apply_op(d, AP1, AP).
+apply_op(z, AP0, AP) :-
+    apply_op(d, AP0, AP1),
+    apply_op(k, AP1, AP).
 
 %% E is the dual edge of E0
 op_dual_edge(F0s, Vs, E0, E) :-
