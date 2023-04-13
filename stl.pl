@@ -1,5 +1,30 @@
 %% utilities for producing STL files from sequences of points
 
+:- ensure_loaded(util).
+:- ensure_loaded(abstract_polytope).
+
+write_stl_ap(Filename, AP) :-
+    ap_facets(AP, STL),
+    write_stl(Filename, STL).
+
+ap_facets(AP, Facets) :-
+    AP = ap(F0s),
+    l_map(stl_tfan_face, F0s, F1ss),
+    l_flatten(F1ss, Facets).
+
+%% Facets is a list of facet(p1, p2, p3) covering the Face
+stl_tfan_face(Face, Facets) :-
+    Face = face([edge(P_base, _)|Es]),
+    l_map(call(stl_tfan_edge(P_base)), Es, Facets0),
+    l_filter(is_triangle, Facets0, Facets).
+
+stl_tfan_edge(P, edge(A, B), facet(P, A, B)).
+
+is_triangle(facet(PA, PB, PC)) :-
+    dif(PA, PB),
+    dif(PB, PC),
+    dif(PA, PC).
+
 write_stl(Filename, Facets) :-
     open(Filename, write, Stream),
     write(Stream, "solid MYSOLID\n"),
@@ -57,3 +82,9 @@ facet_normal(P1,P2,P3,Vn) :-
     compute_vector(P2,P3,V2),
     compute_normal(V1,V2,Vn).
 
+%% TODO: we want to reverse the direction of the normal if it's "facing" the origin
+%% I think this can be done by projecting the normal onto the vector from origin -> midpoint
+facet_midpoint(point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), point(X, Y, Z)) :-
+    X is (X1 + X2 + X3) / 3,
+    Y is (Y1 + Y2 + Y3) / 3,
+    Z is (Z1 + Z2 + Z3) / 3.
