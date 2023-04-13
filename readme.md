@@ -1,47 +1,47 @@
 # shape rotator
 
-## Code
-- Generally a variable `X0` is the untransformed version of `X`
-
-TODO: 
-
-- ambo
-- kis
-- gyro
-- reflect
-- resize
-- ap ->stl
-- readme
-- wiki
-
 ## Usage
-1. generate polyhedra from a seed (character representing platonic solid)
-    - e.g. "T" for tetrahedron
-2. modify seed polyhedron using John Conway polyhedron notation 
-    - e.g. "dkT" = (dual (kis tetrahedron))
-3. below are output options, from most to least likely of getting done:
-    - easiest would be ASCII STL; see resources
-    - lay out as a planar (polyhedral) graph in SVG format (this can be done with all outer edges as sides to a hidden face)
-    - project the shape onto a plane in SVG format 
-        - can get the user to specify a camera angle
-        - extra ambitious: interactive SVG option
-4. we can check graph isomorphism vs known polyhedra database add a caption to the output if there's a match
+TODO
+
+## Internals
+- Until it's time to render them, [polyhedra are represented as follows](./abstract_polytope.pl):
+    ```
+    ap([face([edge(point(1,2,3), point(4,5,6))
+            edge(point(1,2,3), point(9,8,7))
+            edge(point(4,5,6), point(9,8,7))
+            ...])
+        face([...])
+        face([...])
+        face([...])
+        ...])
+    ```
+    The order of `face`s within the `ap` does not matter, nor does the order of the edges within the face.
+
+    The order of `point`s within the `edge(A, B)` does matter (`A @=< B`) for easier edge comparison.
+
+- For STL output, each face is broken [into triangles](https://en.wikipedia.org/wiki/Triangle_fan).
+- Several assumptions are made about the properties of the polyhedron. If you manage to violate them, you'll probably get some fun visual bugs (or a div/0 error.)
+    - Every `face(edge1, edge2, edge3, ...)` lies flat in some plane. This is probably the easiest to break.
+    - Every 2d and 3d shape is always convex (and consequently, the midpoint of any face is inside the face)
+    - No edge or face would intersect the origin when extended. I think we even assume that the origin always lies inside the 3d shape.
+- Generally a variable `X0` is the untransformed version of `X`
 
 ## Resources
 
 - wikipedia: https://en.wikipedia.org/wiki/Conway_polyhedron_notation
 - operators in simple english: https://www.georgehart.com/virtual-polyhedra/conway_notation.html
 - 3d views of a bunch of named polyhedra: http://dmccooey.com/polyhedra/index.html
-    - on this page, we are only concerned with platonic, archimedian, and catalan solids i think
-    - it would be nice if we could add some stats to the output like these have. we'd just have to calculate them
-        - very easy: vertices, edges
-        - maybe: faces, symmetry stats
 - online visualizer that already does a pretty excellent job: https://levskaya.github.io/polyhedronisme/
-- 3D wireframes in SVG: https://prideout.net/blog/svg_wireframes/#examples
-- SVG blog posts (interactivity): https://www.petercollingridge.co.uk/search/?query=svg&page=1
-- STL might be easier than SVG: https://en.wikipedia.org/wiki/STL_(file_format)
-    - Snub cube example: https://en.wikipedia.org/wiki/Snub_cube
 - Projection onto the plane: https://en.wikipedia.org/wiki/Orthographic_projection
 - Polyhedral graph: https://en.wikipedia.org/wiki/Polyhedral_graph
     - Do the numbers of faces, edges, and vertices of a convex polyhedron uniquely specify its graph? I would think no, but I can't find the answer. So probably no.
 - List of all Johnson solids (for later later): https://en.wikipedia.org/wiki/Johnson_solid
+
+## Features to add
+- gyro operator
+- reflect (easy)
+- number of vertices, edges, faces
+- symmetry stats
+- SVG output (project to 2d)
+- Comparison with known polyhedra (graph isomorphism)
+- Better normalization

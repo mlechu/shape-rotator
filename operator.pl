@@ -136,16 +136,19 @@ op_kis_face0(F0, F0_Fs) :-
 
 %% Raise a pyramid on each face.
 %% The new vertex connects to all points of the face.
+%%
+%% TODO:
 %% We want to (try to) maintain convexity, so normalize all
 %% new and existing points to lie on the unit sphere
 op_kis(ap(F0s), ap(Fs)) :-
     l_map(op_kis_face0, F0s, F0s_Fs),
     l_flatten(F0s_Fs, Fs).
 
-%% TODO
 %% Graphically, draw a vertex at the centre of each face, then draw a new edge
 %% from there to each of the face's existing edges (Es), hitting E slightly
 %% counter-clockwise of its midpoint.
 %%
 %% Divide each face of n edges into n faces of 5 edges
+%%
+%% TODO: Likely need to do something more complex to keep faces flat
 op_gyro(AP0, AP0).
