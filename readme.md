@@ -1,11 +1,38 @@
 # shape rotator
 
+Generate polyhedra using [Conway polyhedron notation](https://en.wikipedia.org/wiki/Conway_polyhedron_notation). Implemented in Prolog.
+
 ## Usage
-TODO
+`swipl main.pl`
+
+`gen_shape("your string here")`.
+
+Your string should end with one of the supported seed shapes, and can have operators to the left of the seed which are applied from right to left.
+
+uppercase seed shapes: 
+- T (tetrahedron)
+- C (cube)
+- O (octahedron)
+
+operations: 
+- a (ambo)
+- d (dual)
+- g (gyro) [not yet implemented]
+- k (kis)
+- j (join)
+- s (snub) [not yet implemented]
+- t (truncate)
+- b (bevel)
+- e (expand)
+- m (meta)
+- o (ortho)
+- n (needle)
+- z (zip)
+
 
 ## Internals
 - Until it's time to render them, [polyhedra are represented as follows](./abstract_polytope.pl):
-    ```
+    ``` prolog
     ap([face([edge(point(1,2,3), point(4,5,6))
             edge(point(1,2,3), point(9,8,7))
             edge(point(4,5,6), point(9,8,7))
@@ -26,17 +53,6 @@ TODO
     - No edge or face would intersect the origin when extended. I think we even assume that the origin always lies inside the 3d shape.
 - Generally a variable `X0` is the untransformed version of `X`
 
-## Resources
-
-- wikipedia: https://en.wikipedia.org/wiki/Conway_polyhedron_notation
-- operators in simple english: https://www.georgehart.com/virtual-polyhedra/conway_notation.html
-- 3d views of a bunch of named polyhedra: http://dmccooey.com/polyhedra/index.html
-- online visualizer that already does a pretty excellent job: https://levskaya.github.io/polyhedronisme/
-- Projection onto the plane: https://en.wikipedia.org/wiki/Orthographic_projection
-- Polyhedral graph: https://en.wikipedia.org/wiki/Polyhedral_graph
-    - Do the numbers of faces, edges, and vertices of a convex polyhedron uniquely specify its graph? I would think no, but I can't find the answer. So probably no.
-- List of all Johnson solids (for later later): https://en.wikipedia.org/wiki/Johnson_solid
-
 ## Features to add
 - gyro operator
 - reflect (easy)
@@ -45,3 +61,13 @@ TODO
 - SVG output (project to 2d)
 - Comparison with known polyhedra (graph isomorphism)
 - Better normalization
+
+## Resources
+- wikipedia: https://en.wikipedia.org/wiki/Conway_polyhedron_notation
+- operators in simple english: https://www.georgehart.com/virtual-polyhedra/conway_notation.html
+- 3d views of a bunch of named polyhedra: http://dmccooey.com/polyhedra/index.html
+- online visualizer that already does a pretty excellent job: https://levskaya.github.io/polyhedronisme/
+- Projection onto the plane: https://en.wikipedia.org/wiki/Orthographic_projection
+- Polyhedral graph: https://en.wikipedia.org/wiki/Polyhedral_graph
+    - Do the numbers of faces, edges, and vertices of a convex polyhedron uniquely specify its graph? I would think no, but I can't find the answer. So probably no.
+- List of all Johnson solids (for later later): https://en.wikipedia.org/wiki/Johnson_solid
