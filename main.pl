@@ -6,10 +6,6 @@
 :- ensure_loaded(ap_seed).
 :- ensure_loaded(stl).
 
-%% TODO stub
-to_stl(A, A).
-to_svg(A, A).
-
 %% TODO take the avg of vertex distance from the origin
 %% and ensure minimum/maximum shape size
 
@@ -31,16 +27,18 @@ write_out(Filepath, Data) :-
     write(Fd, Data),
     close(Fd).
 
-gen_shape(Str, S) :-
+gen_shape(Str) :-
     str_to_l(Str, Chars),
     l_reverse(Chars, [Seed|Ops]),
     ap_seed(Seed, S0),
     apply_ops(Ops, S0, S),
+    write_stl_ap(Str, S),
     %% to_stl(S, STL),
     %% to_svg(S, SVG),
     %% write_out("shape.stl", STL),
     %% write_out("shape.svg", SVG),
     format(string(X), "~w", S),
-    write_out("shape.txt", X).
+    atom_concat(Str, ".txt", Stxt),
+    write_out(Stxt, X).
 
-main :- gen_shape("ddddC", _).
+main :- gen_shape("kC").

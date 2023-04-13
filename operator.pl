@@ -10,13 +10,26 @@
 %%
 %% algorithms reqd only for dual, (ambo OR join), kis, gyro, maybe propellor
 %%
-apply_op(a, AP0, AP) :- op_ambo(AP0, AP).
-apply_op(d, AP0, AP) :- op_dual(AP0, AP).
-apply_op(g, AP0, AP).
-apply_op(j, AP0, AP).
-apply_op(k, AP0, AP) :- op_kis(AP0, AP).
-apply_op(s, AP0, AP).
-apply_op(t, AP0, AP).
+apply_op(a, AP0, AP) :-
+    op_ambo(AP0, AP).
+apply_op(d, AP0, AP) :-
+    op_dual(AP0, AP).
+apply_op(g, AP0, AP0).
+%% TODO
+apply_op(k, AP0, AP) :-
+    op_kis(AP0, AP).
+apply_op(j, AP0, AP) :-
+    apply_op(d, AP0, AP1),
+    apply_op(a, AP1, AP2),
+    apply_op(d, AP2, AP).
+apply_op(s, AP0, AP) :-
+    apply_op(d, AP0, AP1),
+    apply_op(g, AP1, AP2),
+    apply_op(d, AP2, AP).
+apply_op(t, AP0, AP) :-
+    apply_op(d, AP0, AP1),
+    apply_op(k, AP1, AP2),
+    apply_op(d, AP2, AP).
 
 %% E is the dual edge of E0
 op_dual_edge(F0s, Vs, E0, E) :-
@@ -131,7 +144,9 @@ op_kis_triangle(Midpoint, edge(A, B), T) :-
 %% meeting at the midpoint of F0
 op_kis_face0(F0, F0_Fs) :-
     F0 = face(Es),
-    ap_face_avg(F0, Midpoint),
+    ap_face_avg(F0, Midpoint0),
+    %% HACK: Raise the midpoint by 20%, don't check for convexity
+    *(Midpoint0, 1.2, Midpoint),
     l_map(call(op_kis_triangle(Midpoint)), Es, F0_Fs).
 
 %% Raise a pyramid on each face.

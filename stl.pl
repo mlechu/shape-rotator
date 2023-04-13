@@ -9,10 +9,7 @@ ap_facets(AP, Facets) :-
     AP = ap(F0s),
     l_map(stl_tfan_face, F0s, F1ss),
     l_flatten(F1ss, Facets_pm),
-    l_map(orient_facet, Facets_pm, Facets),
-    write("\n"),
-    write(Facets)
-.
+    l_map(orient_facet, Facets_pm, Facets).
 
 %% Facets is a list of facet(p1, p2, p3) covering the Face
 stl_tfan_face(Face, Facets) :-
@@ -36,15 +33,19 @@ orient_facet(F0, F) :-
     %%
     %% The midpoint (vector) used is that of the triangle, not the whole face
     facet_mid(F0, Mid),
-    write("\n"),
-    write(Mid),
     vector_dot(Vn_pm, Mid, DP),
     ( DP >= 0 -> F = F0
     ; F = facet(P3, P2, P1)
     ).
 
 write_stl(Filename, Facets) :-
-    open(Filename, write, Stream),
+    \+ exists_directory("out"),
+    make_directory("out"),
+    write_stl(Filename, Facets).
+write_stl(Filename, Facets) :-
+    atom_concat("out/", Filename, Path0),
+    atom_concat(Path0, ".stl", Path),
+    open(Path, write, Stream),
     write(Stream, "solid MYSOLID\n"),
     write_facets(Facets, Stream),
     write(Stream, "endsolid MYSOLID\n"),
