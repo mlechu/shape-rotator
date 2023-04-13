@@ -123,3 +123,8 @@ l_filter(Pred0, [H0|T0], Extra, L) :-
 l_zip([], [], []).
 l_zip([HA|TA], [HB|TB], [zip(HA, HB)|T]) :-
     l_zip(TA, TB, T).
+
+%% L is the contents of all of L0s in order
+l_flatten([], []).
+l_flatten(L0s, L) :-
+    l_foldr(l_append, [], L0s, L).
