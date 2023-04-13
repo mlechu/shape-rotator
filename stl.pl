@@ -1,5 +1,3 @@
-%% utilities for producing STL files from sequences of points
-
 :- ensure_loaded(util).
 :- ensure_loaded(abstract_polytope).
 
@@ -10,7 +8,11 @@ write_stl_ap(Filename, AP) :-
 ap_facets(AP, Facets) :-
     AP = ap(F0s),
     l_map(stl_tfan_face, F0s, F1ss),
-    l_flatten(F1ss, Facets).
+    l_flatten(F1ss, Facets_pm),
+    l_map(orient_facet, Facets_pm, Facets),
+    write("\n"),
+    write(Facets)
+.
 
 %% Facets is a list of facet(p1, p2, p3) covering the Face
 stl_tfan_face(Face, Facets) :-
@@ -25,6 +27,22 @@ is_triangle(facet(PA, PB, PC)) :-
     dif(PB, PC),
     dif(PA, PC).
 
+%% F has the same points as F0, but in anticlockwise (outward normal) order
+orient_facet(F0, F) :-
+    F0 = facet(P1, P2, P3),
+    facet_normal(F0, Vn_pm),
+    %% Dot product of the vector from origin -> midpoint with the facet normal
+    %% should be positive with an outward-facing facet normal.
+    %%
+    %% The midpoint (vector) used is that of the triangle, not the whole face
+    facet_mid(F0, Mid),
+    write("\n"),
+    write(Mid),
+    vector_dot(Vn_pm, Mid, DP),
+    ( DP >= 0 -> F = F0
+    ; F = facet(P3, P2, P1)
+    ).
+
 write_stl(Filename, Facets) :-
     open(Filename, write, Stream),
     write(Stream, "solid MYSOLID\n"),
@@ -38,8 +56,9 @@ write_facets([F|T], Stream) :-
     write(Stream, Result),
     write_facets(T, Stream).
 
-format_facet(facet(P1,P2,P3),Result) :-
-    facet_normal(P1,P2,P3,vector(Xn,Yn,Zn)),
+format_facet(F, Result) :-
+    F = facet(P1,P2,P3),
+    facet_normal(F,vector(Xn,Yn,Zn)),
     format(string(I1), "  facet normal  ~w  ~w  ~w\n", [Xn,Yn,Zn]),
     string_concat(I1, "    outer loop\n", I2),
     format_point(P1, P1s),
@@ -52,12 +71,15 @@ format_facet(facet(P1,P2,P3),Result) :-
     string_concat(I6, "  endfacet\n", Result).
 
 format_point(point(X,Y,Z), Ps) :-
-    format(string(Ps), "      vertex    ~w  ~w  ~w\n", [X,Y,Z]).
+    format(string(Ps), "      vertex    ~20f  ~20f  ~20f\n", [X,Y,Z]).
 
-compute_vector(point(X1,Y1,Z1), point(X2,Y2,Z2), vector(X,Y,Z)) :-
-    X is X2-X1,
-    Y is Y2-Y1,
-    Z is Z2-Z1.
+vector_from_points(point(X0,Y0,Z0), point(XF,YF,ZF), vector(X,Y,Z)) :-
+    X is XF-X0,
+    Y is YF-Y0,
+    Z is ZF-Z0.
+
+vector_dot(vector(X1,Y1,Z1), vector(X2,Y2,Z2), DP) :-
+    DP is (X1 * X2) + (Y1 * Y2) + (Z1 * Z2).
 
 vector_cross(vector(X1,Y1,Z1), vector(X2,Y2,Z2), vector(X,Y,Z)) :-
     X is Y1*Z2 - Z1*Y2,
@@ -73,18 +95,22 @@ vector_normalize(vector(X,Y,Z), vector(Xn,Yn,Zn)) :-
     Yn is Y / M,
     Zn is Z / M.
 
-compute_normal(V1,V2,Vn) :-
+v_invert(vector(X0, Y0, Z0), vector(X, Y, Z)) :-
+    X is 0 - X0,
+    Y is 0 - Y0,
+    Z is 0 - Z0.
+
+%% P1, P2, P3 are ordered anticlockwise viewed from the outside
+%% '   .   ' normal = 2->3 cross 2->1
+facet_normal(F,Vn) :-
+    F = facet(P1,P2,P3),
+    vector_from_points(P2,P3,V1),
+    vector_from_points(P2,P1,V2),
     vector_cross(V1,V2,Vc),
     vector_normalize(Vc,Vn).
 
-facet_normal(P1,P2,P3,Vn) :-
-    compute_vector(P1,P2,V1),
-    compute_vector(P2,P3,V2),
-    compute_normal(V1,V2,Vn).
-
-%% TODO: we want to reverse the direction of the normal if it's "facing" the origin
-%% I think this can be done by projecting the normal onto the vector from origin -> midpoint
-facet_midpoint(point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3), point(X, Y, Z)) :-
+facet_mid(F, vector(X, Y, Z)) :-
+    F = facet(point(X1, Y1, Z1), point(X2, Y2, Z2), point(X3, Y3, Z3)),
     X is (X1 + X2 + X3) / 3,
     Y is (Y1 + Y2 + Y3) / 3,
     Z is (Z1 + Z2 + Z3) / 3.
