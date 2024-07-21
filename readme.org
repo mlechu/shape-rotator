@@ -1,0 +1,120 @@
+* shape rotator
+
+Generate polyhedra using [[https://en.wikipedia.org/wiki/Conway_polyhedron_notation][Conway polyhedron notation]]. Implemented in Prolog.
+
+[[./img/shapes-nobg.png]]
+
+(Each row in the picture was produced by applying the same operation(s) to all
+five platonic solids.  You can see some relationships between the platonic
+solids, e.g. ~aaT = aC~, ~dI = D~.)
+
+#+begin_example
+  T   C   O   I   D
+ tT  tC  tO  tI  tD
+ aT  aC  aO  aI  aD
+aaT aaC aaO aaI aaD
+ dT  dC  dO  dI  dD
+#+end_example
+
+** Dependencies
+
+The program requires SWI Prolog, which available [[https://www.swi-prolog.org][here]] (or with nix, do
+~nix develop~).
+
+** Usage
+
+~swipl main.pl~
+
+~gen_shape("your string here").~
+
+Some examples:
+
+- ~gen_shape("eD").~
+- ~gen_shape("dkC").~
+- ~gen_shape("aI").~
+
+Your string should end with one of the supported seed shapes (see below), and
+can have operators to the left of the seed which are applied from right to left.
+
+Seed shapes (uppercase):
+- ~T~ (tetrahedron)
+- ~C~ (cube)
+- ~O~ (octahedron)
+- ~D~ (dodecahedron)
+- ~I~ (icosahedron)
+
+Operations:
+- ~a~ (ambo)
+- ~d~ (dual)
+- ~g~ (gyro) [not yet implemented]
+- ~k~ (kis)
+- ~j~ (join)
+- ~s~ (snub) [not yet implemented]
+- ~t~ (truncate)
+- ~b~ (bevel)
+- ~e~ (expand)
+- ~m~ (meta)
+- ~o~ (ortho)
+- ~n~ (needle)
+- ~z~ (zip)
+
+*** Viewing STL output
+
+Find output files in ./out. If you have macOS, you can rotate the generated 3D
+shapes in Preview.app!  Viewers are available online, too.
+
+** Internals
+
+- Until it's time to render them, [[./abstract_polytope.pl][polyhedra are represented as follows]]:
+  #+begin_src prolog
+    ap([face([edge(point(1,2,3), point(4,5,6))
+              edge(point(1,2,3), point(9,8,7))
+              edge(point(4,5,6), point(9,8,7)) ...])
+        face([...])
+        face([...])
+        face([...]) ...])
+  #+end_src
+
+  The order of ~face~s within the ~ap~ does not matter, nor does the order of
+  the edges within the face.
+
+  The order of ~point~s within the ~edge(A, B)~ does matter (~A @=< B~) for
+  easier edge comparison.
+- For STL output, each face is broken [[https://en.wikipedia.org/wiki/Triangle_fan][into triangles]].
+- Several assumptions are made about the properties of the polyhedron. If you
+  manage to violate them (which is not difficult at the moment), you'll probably
+  get some fun visual bugs (or a div/0 error.)
+  - Every ~face(edge1, edge2, edge3, ...)~ lies flat in some plane.
+  - Every 2d and 3d shape is always convex (and consequently, the midpoint of
+    any face is inside the face)
+  - No edge or face would intersect the origin when extended. I think we even
+    assume that the origin always lies inside the 3d shape.
+
+** Features to add
+
+- gyro operator and friends
+- Improve kis, which naively puts a constant-height pyramid on each face
+- reflect (easy)
+- number of vertices, edges, faces
+- symmetry stats, groups
+- SVG output (project to 2d)
+- Comparison with known polyhedra (graph isomorphism)
+- Better normalization
+
+** Resources
+
+- wikipedia: https://en.wikipedia.org/wiki/Conway_polyhedron_notation
+- operators in simple english:
+  https://www.georgehart.com/virtual-polyhedra/conway_notation.html
+- 3d views of a bunch of named polyhedra:
+  http://dmccooey.com/polyhedra/index.html
+- online visualizer that already does a pretty excellent job:
+  https://levskaya.github.io/polyhedronisme/
+- Projection onto the plane:
+  https://en.wikipedia.org/wiki/Orthographic_projection
+- Polyhedral graph: https://en.wikipedia.org/wiki/Polyhedral_graph
+  - Do the numbers of faces, edges, and vertices of a convex polyhedron uniquely
+    specify its graph? I would think no, but I can't find the answer. So
+    probably no.
+- List of all Johnson solids (for later later):
+  https://en.wikipedia.org/wiki/Johnson_solid
